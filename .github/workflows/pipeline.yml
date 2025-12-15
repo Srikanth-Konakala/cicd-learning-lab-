@@ -1,0 +1,23 @@
+# 1. THE NAME
+name: My First Automation
+
+# 2. THE TRIGGER
+# "on: push" means "Start this workflow whenever I push code to the repository"
+on: [push]
+
+# 3. THE KITCHEN (The Job)
+jobs:
+  build-my-code:
+    # "runs-on" tells GitHub to give us a fresh Ubuntu Linux server
+    runs-on: ubuntu-latest
+
+    # 4. THE STEPS
+    steps:
+      # Step A: We need the robot to download your code from the repo.
+      # We use a pre-made action called "checkout" to do this.
+      - name: Get the code
+        uses: actions/checkout@v3
+
+      # Step B: Now we run the Python command, just like on your laptop.
+      - name: Run my python script
+        run: python app.py
