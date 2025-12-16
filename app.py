@@ -1,48 +1,39 @@
-import os
-import logging
-import sys
+from flask import Flask, jsonify, request
 
-# 1. SETUP LOGGING (The "Clear Logging" requirement)
-# This makes logs look like: "2023-10-27 10:00:00 - INFO - Starting build..."
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+app = Flask(__name__)
 
-def main():
-    logging.info("--- STARTING AUTOMATION SCRIPT ---")
+# Temporary in-memory database (We will replace this with PostgreSQL later)
+inventory_data = [
+    {"id": 1, "product": "Milk (1L)", "quantity": 50, "price": 1.50},
+    {"id": 2, "product": "Cheese (200g)", "quantity": 20, "price": 3.00},
+    {"id": 3, "product": "Butter (500g)", "quantity": 15, "price": 2.50}
+]
 
-    output_folder = "artifact_folder"
-    file_name = "my_software_build.txt"
-    file_path = os.path.join(output_folder, file_name)
+# --- 1. HEALTH CHECK (Keeps your pipeline happy) ---
+@app.route('/')
+def home():
+    return jsonify({"message": "Dairy Inventory System is Running!", "status": "success"}), 200
 
-    # 2. ERROR HANDLING (The "Reliability" requirement)
-    try:
-        # Step A: Check/Create Folder
-        if not os.path.exists(output_folder):
-            logging.info(f"Folder '{output_folder}' not found. Creating it...")
-            os.makedirs(output_folder)
-        else:
-            logging.info(f"Folder '{output_folder}' already exists.")
+# --- 2. GET ALL INVENTORY ---
+@app.route('/inventory', methods=['GET'])
+def get_inventory():
+    return jsonify(inventory_data), 200
 
-        # Step B: Write the file
-        logging.info(f"Attempting to write file: {file_path}")
-        
-        with open(file_path, "w") as f:
-            f.write("Build Version: 2.0.0 (Enhanced)\n")
-            f.write("Status: Stable\n")
-            f.write("Logs: Active\n")
-        
-        logging.info("File written successfully.")
+# --- 3. ADD NEW ITEM ---
+@app.route('/inventory', methods=['POST'])
+def add_item():
+    new_item = request.get_json()
+    
+    # Simple Validation
+    if not new_item or 'product' not in new_item or 'quantity' not in new_item:
+        return jsonify({"error": "Invalid data. Product and Quantity are required."}), 400
 
-    except Exception as e:
-        # This block only runs if something crashes
-        logging.error(f"CRITICAL FAILURE: {e}")
-        # We force the script to exit with an error code so the pipeline turns Red
-        sys.exit(1)
+    # Simulate adding ID
+    new_item['id'] = len(inventory_data) + 1
+    inventory_data.append(new_item)
+    
+    return jsonify({"message": "Item added successfully", "item": new_item}), 201
 
-    logging.info("--- PROCESS FINISHED SUCCESSFULLY ---")
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    # 'debug=True' helps you see errors during development
+    app.run(host='0.0.0.0', port=5000, debug=True)
