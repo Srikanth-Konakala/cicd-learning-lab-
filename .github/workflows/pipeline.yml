@@ -7,14 +7,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Get the code from GitHub
+      # Step 1: Get the code
       - name: Get the code
         uses: actions/checkout@v3
 
-      # Step 2: Run the cleaning script FIRST
+      # Step 2: NEW! Run the PowerShell Environment Check
+      - name: Run Environment Check (PowerShell)
+        shell: pwsh
+        run: ./scripts/check_env.ps1
+
+      # Step 3: Run the cleaning script
       - name: Prepare the Environment
         run: python scripts/prep.py
 
-      # Step 3: Run the main app script SECOND
+      # Step 4: Run the main app
       - name: Run the Application
         run: python app.py
