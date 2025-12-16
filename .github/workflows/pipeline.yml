@@ -1,33 +1,29 @@
-name: My Automation Pipeline
+name: Dairy System CI/CD
 
 on: [push]
 
 jobs:
-  build-and-prep:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Get the code
-      - name: Get the code
-        uses: actions/checkout@v3
+    # 1. Get your code
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      # Step 2: Check Environment (PowerShell)
-      - name: Run Environment Check
-        shell: pwsh
-        run: ./scripts/check_env.ps1
+    # 2. Install Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-      # Step 3: Prepare/Clean Folder (Python)
-      - name: Prepare the Environment
-        run: python scripts/prep.py
+    # 3. Install Dependencies
+    - name: Install Libraries
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask pytest
 
-      # Step 4: Run the App (Python)
-      - name: Run the Application
-        run: python app.py
-
-      # Step 5: Upload the Artifact
-      # Pay attention: The "uses" and "with" must be indented correctly!
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-final-software
-          path: artifact_folder/
+    # 4. Run the Tests
+    - name: Run Automated Tests
+      run: |
+        pytest test_app.py
