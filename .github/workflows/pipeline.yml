@@ -1,23 +1,20 @@
-# 1. THE NAME
-name: My First Automation
+name: My Automation Pipeline
 
-# 2. THE TRIGGER
-# "on: push" means "Start this workflow whenever I push code to the repository"
 on: [push]
 
-# 3. THE KITCHEN (The Job)
 jobs:
-  build-my-code:
-    # "runs-on" tells GitHub to give us a fresh Ubuntu Linux server
+  build-and-prep:
     runs-on: ubuntu-latest
 
-    # 4. THE STEPS
     steps:
-      # Step A: We need the robot to download your code from the repo.
-      # We use a pre-made action called "checkout" to do this.
+      # Step 1: Get the code from GitHub
       - name: Get the code
         uses: actions/checkout@v3
 
-      # Step B: Now we run the Python command, just like on your laptop.
-      - name: Run my python script
+      # Step 2: Run the cleaning script FIRST
+      - name: Prepare the Environment
+        run: python scripts/prep.py
+
+      # Step 3: Run the main app script SECOND
+      - name: Run the Application
         run: python app.py
