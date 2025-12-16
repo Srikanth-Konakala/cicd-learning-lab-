@@ -1,12 +1,17 @@
 import os
 
-# The folder we created in prep.py
+# Define the folder name
 output_folder = "artifact_folder"
 
-# The name of our "software" file
+# Safety Check: Create the folder if it doesn't exist yet
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+    print(f"Created missing folder: {output_folder}")
+
+# Define the file path
 file_path = os.path.join(output_folder, "my_software_build.txt")
 
-# Create the file and write some text into it
+# Create the file
 with open(file_path, "w") as f:
     f.write("--------------------------------\n")
     f.write("BUILD SUCCESSFUL\n")
